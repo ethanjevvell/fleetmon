@@ -3,6 +3,8 @@ import requests
 import json
 import argparse
 import yagmail
+import pandas as pd
+import datetime as dt
 
 # Global API key
 API_KEY = "802af00e5d74070c90c5a3c49c1e5b59"
@@ -45,6 +47,10 @@ def getVessel(vessel_id):
 
 
 def scanNampho():
+    master_port_tracker = pd.read_csv('master_port_tracker.csv')
+
+    todays_vessels =
+
     URL = f"https://apiv2.fleetmon.com/regional_ais/"
 
     headers = {
@@ -94,7 +100,6 @@ def scanNampho():
     if not_in_all_vessels_by_name or not_in_all_vessels_by_imo_number or not_in_all_vessels_by_mmsi_number:
         sendAlert(
             f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
-
 
         # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
