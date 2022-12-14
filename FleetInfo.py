@@ -163,33 +163,38 @@ def scanNampho():
             f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
 
 
+def main():
     # Create an ArgumentParser object
-parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
 
-parser.add_argument("--getFleet", action="store_true",
-                    help="Returns NK News\" FleetMon fleet")
-parser.add_argument("--getVessel", type=int,
-                    help="Returns NK News\" FleetMon fleet")
-parser.add_argument("--scanNampho", action="store_true",
-                    help="Returns NK News\" FleetMon fleet")
+    parser.add_argument("--getFleet", action="store_true",
+                        help="Returns NK News\" FleetMon fleet")
+    parser.add_argument("--getVessel", type=int,
+                        help="Returns NK News\" FleetMon fleet")
+    parser.add_argument("--scanNampho", action="store_true",
+                        help="Returns NK News\" FleetMon fleet")
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-function_args = {
-    args.getFleet: [],
-    args.getVessel: [args.getVessel],
-    args.scanNampho: []
-}
+    function_args = {
+        args.getFleet: [],
+        args.getVessel: [args.getVessel],
+        args.scanNampho: []
+    }
 
-# Update the function_mapping dictionary to include the delFleet function
-function_mapping = {
-    args.getFleet: getFleet,
-    args.getVessel: getVessel,
-    args.scanNampho: scanNampho
-}
+    # Update the function_mapping dictionary to include the delFleet function
+    function_mapping = {
+        args.getFleet: getFleet,
+        args.getVessel: getVessel,
+        args.scanNampho: scanNampho
+    }
 
-# Iterate over the dictionary and call the functions with the appropriate arguments
-for arg_value, function in function_mapping.items():
-    if arg_value:
-        result = function(*function_args[arg_value])
-        print(result)
+    # Iterate over the dictionary and call the functions with the appropriate arguments
+    for arg_value, function in function_mapping.items():
+        if arg_value:
+            result = function(*function_args[arg_value])
+            print(result)
+
+
+if __name__ == "__main__":
+    main()
