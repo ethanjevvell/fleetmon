@@ -76,7 +76,7 @@ def updateNamphoRecords(vessel_list):
     all_nampho_vessel_names_set = set(vessel_list)
 
     master_port_tracker = pd.read_csv(
-        '/Users/ethanjewell/Desktop/Python Env/Scripting/FleetMon/fleetmon/fleetmon/master_port_tracker.csv')
+        'master_port_tracker.csv')
 
     if not master_port_tracker['Date'].eq(f'{todays_date}').any():
         all_nampho_vessel_names_set = formatForSheet(
@@ -100,7 +100,7 @@ def updateNamphoRecords(vessel_list):
         print(master_port_tracker)
 
     master_port_tracker.to_csv(
-        '/Users/ethanjewell/Desktop/Python Env/Scripting/FleetMon/fleetmon/fleetmon/master_port_tracker.csv', index=False)
+        'master_port_tracker.csv', index=False)
 
 
 def scanNampho():
@@ -161,6 +161,7 @@ def scanNampho():
     if not_in_all_vessels_by_name or not_in_all_vessels_by_imo_number or not_in_all_vessels_by_mmsi_number:
         sendAlert(
             f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
+
 
     # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
