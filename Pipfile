@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 requests = "*"
 matplotlib = "*"
+yagmail = "*"
+pandas = "*"
+datetime = "*"
 
 [dev-packages]
 

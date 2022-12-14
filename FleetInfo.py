@@ -46,8 +46,64 @@ def getVessel(vessel_id):
     return response_json
 
 
+def makeList(raw):
+    raw = raw.replace('[', '')
+    raw = raw.replace(']', '')
+    raw = raw.replace('\'', '')
+    raw = raw.split(',')
+    raw = [ves.strip(' ') for ves in raw]
+
+    # If this is the first time we're creating an entry for a given day, .split() will generate 'nan', which should be removed.
+    if raw.count('nan') > 0:
+        raw.remove('nan')
+
+    print(f'List after makeList: {set(raw)}')
+    return set(raw)
+
+
+def formatForSheet(raw):
+    raw = str(raw)
+    raw = raw.replace('{', '')
+    raw = raw.replace('}', '')
+    raw = raw.replace('\'', '')
+    print(f'List after formatForSheet: {str(raw)}')
+    return str(raw)
+
+
+def updateNamphoRecords(vessel_list):
+
+    todays_date = str(dt.date.today())
+    all_nampho_vessel_names_set = set(vessel_list)
+
+    master_port_tracker = pd.read_csv(
+        '/Users/ethanjewell/Desktop/Python Env/Scripting/FleetMon/fleetmon/fleetmon/master_port_tracker.csv')
+
+    if not master_port_tracker['Date'].eq(f'{todays_date}').any():
+        all_nampho_vessel_names_set = formatForSheet(
+            all_nampho_vessel_names_set)
+
+        new_row = pd.DataFrame(
+            {'Date': [str(dt.date.today())], 'Nampho': str(all_nampho_vessel_names_set)})
+        master_port_tracker = pd.concat([master_port_tracker, new_row])
+        print(str(all_nampho_vessel_names_set))
+
+    else:
+        sheet_vessels = str(master_port_tracker[master_port_tracker['Date']
+                                                == todays_date]['Nampho'].values)
+        sheet_vessels = makeList(sheet_vessels)
+        sheet_vessels.update(all_nampho_vessel_names_set)
+        sheet_vessels = formatForSheet(sheet_vessels)
+
+        master_port_tracker.loc[master_port_tracker['Date']
+                                == todays_date, 'Nampho'] = sheet_vessels
+
+        print(master_port_tracker)
+
+    master_port_tracker.to_csv(
+        '/Users/ethanjewell/Desktop/Python Env/Scripting/FleetMon/fleetmon/fleetmon/master_port_tracker.csv', index=False)
+
+
 def scanNampho():
-    master_port_tracker = pd.read_csv('master_port_tracker.csv')
 
     URL = "https://apiv2.fleetmon.com/regional_ais/"
 
@@ -63,46 +119,48 @@ def scanNampho():
     nampho_set = [ves['name'] for ves in nampho_set]
     nampho_set = set(nampho_set)
 
+    updateNamphoRecords(nampho_set)
+
     print(nampho_set)
 
-    # with open('fleet.txt') as f:
-    #     fleet_text = f.read()
+    with open('fleet.txt') as f:
+        fleet_text = f.read()
 
-    # vessel_dict = json.loads(fleet_text)
+    vessel_dict = json.loads(fleet_text)
 
-    # all_vessels = vessel_dict["vessels"]
-    # nampho_vessels = nampho_dict["vessels"]
+    all_vessels = vessel_dict["vessels"]
+    nampho_vessels = nampho_dict["vessels"]
 
-    # all_vessel_names = [ves['name'] for ves in all_vessels]
-    # all_nampho_vessel_names = [ves['name'] for ves in nampho_vessels]
+    all_vessel_names = [ves['name'] for ves in all_vessels]
+    all_nampho_vessel_names = [ves['name'] for ves in nampho_vessels]
 
-    # all_vessel_imo_numbers = [ves['imo_number'] for ves in all_vessels]
-    # all_nampho_vessel_imo_numbers = [
-    #     ves['imo_number'] for ves in nampho_vessels]
+    all_vessel_imo_numbers = [ves['imo_number'] for ves in all_vessels]
+    all_nampho_vessel_imo_numbers = [
+        ves['imo_number'] for ves in nampho_vessels]
 
-    # all_vessel_mmsi_numbers = [ves['mmsi_number'] for ves in all_vessels]
-    # all_nampho_vessel_mmsi_numbers = [
-    #     ves['mmsi_number'] for ves in nampho_vessels]
+    all_vessel_mmsi_numbers = [ves['mmsi_number'] for ves in all_vessels]
+    all_nampho_vessel_mmsi_numbers = [
+        ves['mmsi_number'] for ves in nampho_vessels]
 
-    # # create sets of the names, IMO numbers, and MMSI numbers for all vessels and Nampho vessels
-    # all_vessel_names_set = set(all_vessel_names)
-    # all_nampho_vessel_names_set = set(all_nampho_vessel_names)
-    # all_vessel_imo_numbers_set = set(all_vessel_imo_numbers)
-    # all_nampho_vessel_imo_numbers_set = set(all_nampho_vessel_imo_numbers)
-    # all_vessel_mmsi_numbers_set = set(all_vessel_mmsi_numbers)
-    # all_nampho_vessel_mmsi_numbers_set = set(all_nampho_vessel_mmsi_numbers)
+    # create sets of the names, IMO numbers, and MMSI numbers for all vessels and Nampho vessels
+    all_vessel_names_set = set(all_vessel_names)
+    all_nampho_vessel_names_set = set(all_nampho_vessel_names)
+    all_vessel_imo_numbers_set = set(all_vessel_imo_numbers)
+    all_nampho_vessel_imo_numbers_set = set(all_nampho_vessel_imo_numbers)
+    all_vessel_mmsi_numbers_set = set(all_vessel_mmsi_numbers)
+    all_nampho_vessel_mmsi_numbers_set = set(all_nampho_vessel_mmsi_numbers)
 
-    # # find any Nampho vessels that are not in the all vessels list by using the difference operator on the sets
-    # not_in_all_vessels_by_name = all_nampho_vessel_names_set - all_vessel_names_set
-    # not_in_all_vessels_by_imo_number = all_nampho_vessel_imo_numbers_set - \
-    #     all_vessel_imo_numbers_set
-    # not_in_all_vessels_by_mmsi_number = all_nampho_vessel_mmsi_numbers_set - \
-    #     all_vessel_mmsi_numbers_set
+    # find any Nampho vessels that are not in the all vessels list by using the difference operator on the sets
+    not_in_all_vessels_by_name = all_nampho_vessel_names_set - all_vessel_names_set
+    not_in_all_vessels_by_imo_number = all_nampho_vessel_imo_numbers_set - \
+        all_vessel_imo_numbers_set
+    not_in_all_vessels_by_mmsi_number = all_nampho_vessel_mmsi_numbers_set - \
+        all_vessel_mmsi_numbers_set
 
-    # # print the resulting sets to see the Nampho vessels that are not in the all vessels list
-    # if not_in_all_vessels_by_name or not_in_all_vessels_by_imo_number or not_in_all_vessels_by_mmsi_number:
-    #     sendAlert(
-    #         f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
+    # print the resulting sets to see the Nampho vessels that are not in the all vessels list
+    if not_in_all_vessels_by_name or not_in_all_vessels_by_imo_number or not_in_all_vessels_by_mmsi_number:
+        sendAlert(
+            f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
 
     # Create an ArgumentParser object
 parser = argparse.ArgumentParser()
