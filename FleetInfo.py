@@ -9,6 +9,7 @@ import datetime as dt
 # Global API key
 API_KEY = "802af00e5d74070c90c5a3c49c1e5b59"
 OUT_PATH = '/home/ethanjewell/fleetmon/master_port_tracker.csv'
+FLEET = '/home/ethanjewell/fleetmon/fleet.txt'
 
 
 def sendAlert(content):  # Sends an email with given content
@@ -124,7 +125,7 @@ def scanNampho():
 
     print(nampho_set)
 
-    with open('fleet.txt') as f:
+    with open(FLEET) as f:
         fleet_text = f.read()
 
     vessel_dict = json.loads(fleet_text)
