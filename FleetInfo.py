@@ -8,6 +8,7 @@ import datetime as dt
 
 # Global API key
 API_KEY = "802af00e5d74070c90c5a3c49c1e5b59"
+OUT_PATH = '/home/ethanjewell/fleetmon/master_port_tracker.csv'
 
 
 def sendAlert(content):  # Sends an email with given content
@@ -76,7 +77,7 @@ def updateNamphoRecords(vessel_list):
     all_nampho_vessel_names_set = set(vessel_list)
 
     master_port_tracker = pd.read_csv(
-        'master_port_tracker.csv')
+        OUT_PATH)
 
     if not master_port_tracker['Date'].eq(f'{todays_date}').any():
         all_nampho_vessel_names_set = formatForSheet(
@@ -100,7 +101,7 @@ def updateNamphoRecords(vessel_list):
         print(master_port_tracker)
 
     master_port_tracker.to_csv(
-        'master_port_tracker.csv', index=False)
+        OUT_PATH, index=False)
 
 
 def scanNampho():
