@@ -8,8 +8,8 @@ import datetime as dt
 
 # Global API key
 API_KEY = "802af00e5d74070c90c5a3c49c1e5b59"
-OUT_PATH = '/home/ethanjewell/fleetmon/master_port_tracker.csv'
-FLEET = '/home/ethanjewell/fleetmon/fleet.txt'
+OUT_PATH = '/home/scripts/fleetmon/master_port_tracker.csv'
+FLEET = '/home/scripts/fleetmon/fleet.txt'
 
 
 def sendAlert(content):  # Sends an email with given content
