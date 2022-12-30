@@ -117,13 +117,13 @@ def scanNampho():
     response = requests.get(URL, headers=headers)
     nampho_dict = response.json()
 
+    print(nampho_dict)
+
     nampho_set = nampho_dict['vessels']
     nampho_set = [ves['name'] for ves in nampho_set]
     nampho_set = set(nampho_set)
 
     updateNamphoRecords(nampho_set)
-
-    print(nampho_set)
 
     with open(FLEET) as f:
         fleet_text = f.read()
