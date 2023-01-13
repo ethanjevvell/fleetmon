@@ -14,10 +14,10 @@ FLEET = '/home/scripts/fleetmon/fleet.txt'
 
 def sendAlert(content):  # Sends an email with given content
 
-    user = yagmail.SMTP(user='nknews.thermalradar@gmail.com',
-                        password='pknzhwayprlenjyi')
+    user = yagmail.SMTP(user='nknews.scriptalerts@gmail.com',
+                        password='zjfelavkafmzykiu') # This is the App Password for Python scripts that use this gmail account! Keep it secure.
     user.send(to='ethan.jewell@nknews.org',
-                 subject='[SHIP ALERT] - New vessel detected in Nampho',
+                 subject='[SHIP ALERT] -- New vessel detected in Nampho',
                  contents=content)
 
 
@@ -165,6 +165,9 @@ def scanNampho():
             f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
 
 
+def debugEmail():
+    sendAlert("Testing email works")
+
 def main():
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser()
@@ -175,20 +178,24 @@ def main():
                         help="Returns NK News\" FleetMon fleet")
     parser.add_argument("--scanNampho", action="store_true",
                         help="Returns NK News\" FleetMon fleet")
+    parser.add_argument("--debugEmail", action="store_true",
+                        help="Returns NK News\" FleetMon fleet")
 
     args = parser.parse_args()
 
     function_args = {
         args.getFleet: [],
         args.getVessel: [args.getVessel],
-        args.scanNampho: []
+        args.scanNampho: [],
+        args.debugEmail: []
     }
 
     # Update the function_mapping dictionary to include the delFleet function
     function_mapping = {
         args.getFleet: getFleet,
         args.getVessel: getVessel,
-        args.scanNampho: scanNampho
+        args.scanNampho: scanNampho,
+        args.debugEmail: debugEmail
     }
 
     # Iterate over the dictionary and call the functions with the appropriate arguments
