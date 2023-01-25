@@ -1,4 +1,5 @@
 
+import os
 import requests
 import json
 import argparse
@@ -7,7 +8,8 @@ import pandas as pd
 import datetime as dt
 
 # Global API key
-API_KEY = "802af00e5d74070c90c5a3c49c1e5b59"
+API_KEY = os.environ.get("FM_PASS")
+EMAIL_PASS = os.environ.get("EMAIL_PASS")
 OUT_PATH = '/home/scripts/fleetmon/master_port_tracker.csv'
 FLEET = '/home/scripts/fleetmon/fleet.txt'
 
@@ -15,7 +17,7 @@ FLEET = '/home/scripts/fleetmon/fleet.txt'
 def sendAlert(content):  # Sends an email with given content
 
     user = yagmail.SMTP(user='nknews.scriptalerts@gmail.com',
-                        password='zjfelavkafmzykiu') # This is the App Password for Python scripts that use this gmail account! Keep it secure.
+                        password=EMAIL_PASS)  # This is the App Password for Python scripts that use this gmail account! Keep it secure.
     user.send(to='ethan.jewell@nknews.org',
                  subject='[SHIP ALERT] -- New vessel detected in Nampho',
                  contents=content)
@@ -59,7 +61,6 @@ def makeList(raw):
     if raw.count('nan') > 0:
         raw.remove('nan')
 
-    print(f'List after makeList: {set(raw)}')
     return set(raw)
 
 
@@ -68,7 +69,6 @@ def formatForSheet(raw):
     raw = raw.replace('{', '')
     raw = raw.replace('}', '')
     raw = raw.replace('\'', '')
-    print(f'List after formatForSheet: {str(raw)}')
     return str(raw)
 
 
@@ -87,7 +87,6 @@ def updateNamphoRecords(vessel_list):
         new_row = pd.DataFrame(
             {'Date': [str(dt.date.today())], 'Nampho': str(all_nampho_vessel_names_set)})
         master_port_tracker = pd.concat([master_port_tracker, new_row])
-        print(str(all_nampho_vessel_names_set))
 
     else:
         sheet_vessels = str(master_port_tracker[master_port_tracker['Date']
@@ -116,8 +115,6 @@ def scanNampho():
 
     response = requests.get(URL, headers=headers)
     nampho_dict = response.json()
-
-    print(nampho_dict)
 
     nampho_set = nampho_dict['vessels']
     nampho_set = [ves['name'] for ves in nampho_set]
@@ -162,11 +159,12 @@ def scanNampho():
     # print the resulting sets to see the Nampho vessels that are not in the all vessels list
     if not_in_all_vessels_by_name or not_in_all_vessels_by_imo_number or not_in_all_vessels_by_mmsi_number:
         sendAlert(
-            f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}')
+            f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}. You must go to FleetMon\'s website and manually add this vessel to our fleet. Then, while in the virtual environment for the fleetmon script, execute the following on the command line: \'python3 FleetInfo.py --getFleet >> fleet.txt\'')
 
 
 def debugEmail():
     sendAlert("Testing email works")
+
 
 def main():
     # Create an ArgumentParser object
