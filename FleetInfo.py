@@ -13,12 +13,14 @@ EMAIL_PASS = os.environ.get("EMAIL_PASS")
 OUT_PATH = '/home/scripts/fleetmon/master_port_tracker.csv'
 FLEET = '/home/scripts/fleetmon/fleet.txt'
 
+SUBSCRIBERS = ["ethan.jewell@nknews.org", "ifang.bremer@nknews.org"]
 
-def sendAlert(content):  # Sends an email with given content
+
+def sendAlert(recipient, content):  # Sends an email with given content
 
     user = yagmail.SMTP(user='nknews.scriptalerts@gmail.com',
                         password=EMAIL_PASS)  # This is the App Password for Python scripts that use this gmail account! Keep it secure.
-    user.send(to='ethan.jewell@nknews.org',
+    user.send(to=recipient,
                  subject='[SHIP ALERT] -- New vessel detected in Nampho',
                  contents=content)
 
@@ -158,8 +160,8 @@ def scanNampho():
 
     # print the resulting sets to see the Nampho vessels that are not in the all vessels list
     if not_in_all_vessels_by_name or not_in_all_vessels_by_imo_number or not_in_all_vessels_by_mmsi_number:
-        sendAlert(
-            f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}. You must go to FleetMon\'s website and manually add this vessel to our fleet. Then, while in the virtual environment for the fleetmon script, execute the following on the command line: \'python3 FleetInfo.py --getFleet >> fleet.txt\'')
+        for subscriber in SUBSCRIBERS:
+            sendAlert(subscriber, f'New ships likely detected. Names: {not_in_all_vessels_by_name}. IMO numbers: {not_in_all_vessels_by_imo_number}. MMSI numbers: {not_in_all_vessels_by_mmsi_number}. You must go to FleetMon\'s website and manually add this vessel to our fleet. Then, while in the virtual environment for the fleetmon script, execute the following on the command line: \'python3 FleetInfo.py --getFleet >> fleet.txt\'')
 
 
 def debugEmail():
